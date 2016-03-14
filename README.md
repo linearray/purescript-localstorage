@@ -65,7 +65,7 @@ main = do
 
 ```
 
-Doc generation currently fails for me with an internal error, so just checkout:
+The generated module documentation is currently less readable than the code, so check it out directly:
 
 https://github.com/eskimor/purescript-localstorage/blob/master/src/Browser/LocalStorage.purs
 
