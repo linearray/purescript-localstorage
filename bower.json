@@ -1,9 +1,13 @@
 {
   "name": "purescript-localstorage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "moduleType": [
     "node"
   ],
+  "repository": {                                                          
+      "type": "git",                                                         
+      "url": "git://github.com/eskimor/purescript-localstorage.git"            
+  },   
   "ignore": [
     "**/.*",
     "node_modules",
