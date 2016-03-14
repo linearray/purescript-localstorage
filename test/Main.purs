@@ -19,7 +19,7 @@ derive instance genericMyKey :: Generic (MyKey a)
 userConfigKey :: MyKey UserConfig
 userConfigKey = UserConfigKey
 
-serverCacheKey :: MyKey UserConfig
+serverCacheKey :: MyKey ServerCache
 serverCacheKey = ServerCacheKey
 
 -- With GADTs this would be even nicer:
