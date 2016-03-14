@@ -8,15 +8,16 @@ import Data.Generic
 import Browser.LocalStorage
 
 
+-- Define a key type:
 
 data MyKey a = UserConfigKey
             | ServerCacheKey
 
 derive instance genericMyKey :: Generic (MyKey a)
 
+-- "Smart" constructors as replacement for GADTs:
 userConfigKey :: MyKey UserConfig
 userConfigKey = UserConfigKey
-
 
 serverCacheKey :: MyKey UserConfig
 serverCacheKey = ServerCacheKey
@@ -28,7 +29,7 @@ data MyKey a where
   ServerCache :: MyKey ServerCache
 --}
 
-
+-- Data to store:
 newtype UserConfig = UserConfig {
   userName :: String
   , email :: String
@@ -43,7 +44,7 @@ newtype ServerCache = ServerCache {
 derive instance genericServerCache :: Generic ServerCache
 
 
-
+-- Actually use it (requires a browser):
 main :: forall e. Eff (console :: CONSOLE, storage :: STORAGE | e) Unit
 main = do
   localStorage.setItem userConfigKey (UserConfig {userName : "Bob", email : "bob@bob.com"})
