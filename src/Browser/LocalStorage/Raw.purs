@@ -1,4 +1,10 @@
-module Browser.LocalStorage.Raw where
+module Browser.LocalStorage.Raw (
+  Storage
+, localStorage
+, sessionStorage
+, EffLocalStorage
+, STORAGE
+  ) where
 
 import Prelude
 import Control.Monad.Eff
@@ -28,25 +34,26 @@ type Storage = {
 , clear :: forall eff. EffLocalStorage eff Unit
 }
 
-localStorage :: Storage
-localStorage = {
-  length : jsLength jsLocalStorage
-, key : jsKey jsLocalStorage
-, getItem : jsGetItem jsLocalStorage
-, setItem : jsSetItem jsLocalStorage
-, removeItem : jsRemoveItem jsLocalStorage
-, clear : jsClear jsLocalStorage
+
+-- This is unsafe of course (it does not work for all parameters storage).
+-- That is why this function is not exported (it should also not be needed).
+-- Otherwise an empty type class with instances for LocalStorage and SessionStorage could be used.
+mkStorage :: forall storage. storage -> Storage
+mkStorage jsStorage = {
+  length : jsLength jsStorage
+, key : jsKey jsStorage
+, getItem : jsGetItem jsStorage
+, setItem : jsSetItem jsStorage
+, removeItem : jsRemoveItem jsStorage
+, clear : jsClear jsStorage
 }
 
+localStorage :: Storage
+localStorage = mkStorage jsLocalStorage
+
 sessionStorage :: Storage
-sessionStorage = {
-  length : jsLength jsSessionStorage
-, key : jsKey jsSessionStorage
-, getItem : jsGetItem jsSessionStorage
-, setItem : jsSetItem jsSessionStorage
-, removeItem : jsRemoveItem jsSessionStorage
-, clear : jsClear jsSessionStorage
-}
+sessionStorage = mkStorage jsSessionStorage
+
 
 jsLength :: forall eff storage. storage -> EffLocalStorage eff Int
 jsLength = map (fromMaybe (unsafeCrashWith "The browser should return a valid length for storage") <<< I.fromNumber)
