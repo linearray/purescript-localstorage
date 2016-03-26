@@ -3,9 +3,16 @@
 Access JS webstorage (local &amp; session) in a typesafe and convenient way.
 Just define a key type with some smart constructors and you are done
 (GADTs would even make those unnecessary).
-The type system then saves you from misspelling keys (no plain strings)
-and also makes sure that you can only read the same type as you wrote before.
-As the keys encode the type of the data stored with them in the type system.
+
+The type system then saves you from misspelling keys (no plain
+strings) and also makes sure that you can only read the same type as
+you wrote before. This is because the keys encode the type of the data
+stored with them in the type system.
+
+In addition to type safety, having a key type instead of plain strings
+also makes the API easier to use, because with the value type encoded
+in the key type, type inference is always possible, even for a plain
+`getItem` call. You will never need any type annotations!
 
 Find a basic usage example in test/Main.purs, repeated here for convenience:
 
