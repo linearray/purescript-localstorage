@@ -12,7 +12,7 @@ import Data.Argonaut.Core as A
 import Data.Argonaut.Core (JNumber, JString, Json)
 import Data.Int as I
 import Data.Maybe
-import Data.Function
+import Data.Function.Uncurried
 import Partial.Unsafe (unsafeCrashWith)
 
 

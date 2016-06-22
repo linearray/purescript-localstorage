@@ -33,7 +33,7 @@ mkStorage :: Raw.Storage -> Storage
 mkStorage raw = {
   length : raw.length
 -- , key = raw.key -- I don't think we need that and we would need a gRead to support it.
-, getItem : map (>>= hushGenericDecode) <<< raw.getItem <<< gShow
+, getItem : map (_ >>= hushGenericDecode) <<< raw.getItem <<< gShow
 , setItem : \key val -> raw.setItem (gShow key) (show $ gEncodeJson val)
 , removeItem : raw.removeItem <<< gShow
 , clear : raw.clear
