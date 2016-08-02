@@ -1,46 +1,36 @@
 "use strict";
 
 // module Browser.LocalStorage.Raw
-// Based on: https://github.com/joneshf/purescript-webstorage/blob/master/src/Browser/WebStorage.js
 
-exports.jsLocalStorage = window.localStorage;
-exports.jsSessionStorage = window.sessionStorage;
+exports.localStorageImpl = function(/*eff*/) {
+  return window.localStorage;
+}
 
-exports.jsUnsafeLength = function(storage) {
-  return function(){
-    return storage.length;
-  }
-};
+exports.sessionStorageImpl = function(/*eff*/) {
+  return window.sessionStorage;
+}
 
-exports.jsUnsafeKey = function(storage,num) {
-  return function(){
-    return storage.key(num);
-  }
-};
-
-exports.jsUnsafeGetItem = function(storage,str) {
-  return function(){
-    return storage.getItem(str);
-  }
-};
-
-exports.jsUnsafeSetItem = function(storage,str,val) {
-  return function(){
-    storage.setItem(str, val);
-    return {};
-  }
-};
-
-exports.jsUnsafeRemoveItem = function(storage,str) {
-  return function(){
-    storage.removeItem(str);
-    return {};
-  }
-};
-
-exports.jsUnsafeClear = function(storage) {
-  return function(){
-    storage.clear();
-    return {};
-  }
-};
+exports.mkStorageImpl = function(nothing) { return function(just) { return function (storage) {
+  function toMaybe(value) { return value == null ? nothing : just(value); }
+  function toUnit() { return {}; }
+  return {
+    length: function(/*eff*/) {
+      return storage.length;
+    },
+    key: function(index) { return function(/*eff*/) {
+      return toMaybe(storage.key(index));
+    }; },
+    getItem: function(key) { return function(/*eff*/) {
+      return toMaybe(storage.getItem(key));
+    }; },
+    setItem: function(key) { return function(item) { return function (/*eff*/) {
+      return toUnit(storage.setItem(key, item));
+    }; }; },
+    removeItem: function(key) { return function(/*eff*/) {
+      return toUnit(storage.removeItem(key));
+    }; },
+    clear: function(/*eff*/) {
+      return toUnit(storage.clear());
+    },
+  };
+}; }; };

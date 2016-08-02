@@ -4,10 +4,10 @@
   "moduleType": [
     "node"
   ],
-  "repository": {                                                          
-      "type": "git",                                                         
-      "url": "git://github.com/eskimor/purescript-localstorage.git"            
-  },   
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/eskimor/purescript-localstorage.git"
+  },
   "ignore": [
     "**/.*",
     "node_modules",
@@ -18,11 +18,7 @@
     "purescript-console": "^1.0.0"
   },
   "dependencies": {
-    "purescript-maybe": "~1.0.0",
-    "purescript-eff": "~1.0.0",
-    "purescript-argonaut-core": "~1.0.0",
-    "purescript-integers": "~1.0.0",
-    "purescript-partial": "~1.1.0",
-    "purescript-argonaut-codecs": "^1.0.0"
+    "purescript-argonaut-codecs": "^1.0.0",
+    "purescript-argonaut-core": "^1.0.0"
   }
 }
