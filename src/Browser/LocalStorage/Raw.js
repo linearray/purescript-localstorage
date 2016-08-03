@@ -10,6 +10,19 @@ exports.sessionStorageImpl = function(/*eff*/) {
   return window.sessionStorage;
 }
 
+exports.mockStorageImpl = function(/*eff*/){
+  var storage = {};
+  return {
+    get keys() { return Object.keys(storage); },
+    get length() { return this.keys.length; },
+    key: function(index) { return this.keys[index]; },
+    getItem: function(key) { return storage[key]; },
+    setItem: function(key, item) { storage[key] = item; },
+    removeItem: function(key) { delete storage[key]; },
+    clear: function() { this.keys.forEach(this.removeItem, this); }
+  };
+};
+
 exports.mkStorageImpl = function(nothing) { return function(just) { return function (storage) {
   function toMaybe(value) { return value == null ? nothing : just(value); }
   function toUnit() { return {}; }

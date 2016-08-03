@@ -4,6 +4,7 @@ module Browser.LocalStorage
 , GTranscode(..)
 , getLocalStorage
 , getSessionStorage
+, newMockStorage
 , mkStorage
 ) where
 
@@ -45,6 +46,9 @@ getLocalStorage = mkStorage <$> Raw.getLocalStorage
 -- also https://github.com/purescript/purescript/issues/2229
 -- getSessionStorage :: forall e. Eff (storage :: Raw.STORAGE, dom :: DOM | e) Storage
 getSessionStorage = mkStorage <$> Raw.getSessionStorage
+
+-- newMockStorage :: forall e. Eff (storage :: Raw.STORAGE, ref :: REF | e) Storage
+newMockStorage = mkStorage <$> Raw.newMockStorage
 
 mkStorage :: Raw.Storage -> Storage
 mkStorage raw =

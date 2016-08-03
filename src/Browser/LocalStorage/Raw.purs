@@ -5,12 +5,14 @@ module Browser.LocalStorage.Raw
 , ForeignStorage
 , getLocalStorage
 , getSessionStorage
+, newMockStorage
 , mkStorage
 ) where
 
 import Prelude
 
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Ref (REF)
 import Data.Maybe (Maybe(..))
 import DOM (DOM)
 
@@ -29,6 +31,7 @@ foreign import data ForeignStorage :: *
 
 foreign import localStorageImpl :: forall e. Eff (dom :: DOM | e) ForeignStorage
 foreign import sessionStorageImpl :: forall e. Eff (dom :: DOM | e) ForeignStorage
+foreign import mockStorageImpl :: forall e. Eff (ref :: REF | e) ForeignStorage
 foreign import mkStorageImpl :: forall a. Maybe a -> (a -> Maybe a) -> ForeignStorage -> Storage
 
 getLocalStorage :: forall e. Eff (dom :: DOM | e) Storage
@@ -36,6 +39,9 @@ getLocalStorage = mkStorage <$> localStorageImpl
 
 getSessionStorage :: forall e. Eff (dom :: DOM | e) Storage
 getSessionStorage = mkStorage <$> sessionStorageImpl
+
+newMockStorage :: forall e. Eff (ref :: REF | e) Storage
+newMockStorage = mkStorage <$> mockStorageImpl
 
 mkStorage :: ForeignStorage -> Storage
 mkStorage = mkStorageImpl Nothing Just
