@@ -23,19 +23,18 @@ type Storage =
   , clear :: forall e. EffStorage e Unit
   }
 type EffStorage e = Eff (storage :: STORAGE | e)
-type EffDOMStorage e = Eff (storage :: STORAGE, dom :: DOM | e)
 
 foreign import data STORAGE :: !
 foreign import data ForeignStorage :: *
 
-foreign import localStorageImpl :: forall e. EffDOMStorage e ForeignStorage
-foreign import sessionStorageImpl :: forall e. EffDOMStorage e ForeignStorage
+foreign import localStorageImpl :: forall e. Eff (dom :: DOM | e) ForeignStorage
+foreign import sessionStorageImpl :: forall e. Eff (dom :: DOM | e) ForeignStorage
 foreign import mkStorageImpl :: forall a. Maybe a -> (a -> Maybe a) -> ForeignStorage -> Storage
 
-getLocalStorage :: forall e. EffDOMStorage e Storage
+getLocalStorage :: forall e. Eff (dom :: DOM | e) Storage
 getLocalStorage = mkStorage <$> localStorageImpl
 
-getSessionStorage :: forall e. EffDOMStorage e Storage
+getSessionStorage :: forall e. Eff (dom :: DOM | e) Storage
 getSessionStorage = mkStorage <$> sessionStorageImpl
 
 mkStorage :: ForeignStorage -> Storage
