@@ -14,11 +14,13 @@
     "bower_components",
     "output"
   ],
-  "devDependencies": {
-    "purescript-console": "^1.0.0"
-  },
   "dependencies": {
     "purescript-argonaut-codecs": "^1.0.0",
-    "purescript-argonaut-core": "^1.0.0"
+    "purescript-argonaut-core": "^1.0.0",
+    "purescript-refs": "~1.0.0"
+  },
+  "devDependencies": {
+    "purescript-assert": "^1.0.0",
+    "purescript-console": "^1.0.0"
   }
 }
