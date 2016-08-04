@@ -1,5 +1,5 @@
 "use strict";
 
-exports.sessionStorageImpl = function() {
+exports.getSessionStorage = function() {
   return window.sessionStorage;
 }

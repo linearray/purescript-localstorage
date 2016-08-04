@@ -1,6 +1,6 @@
 module DOM.WebStorage (module Exports) where
 
-import DOM.WebStorage.Internal.Foreign (STORAGE) as Exports
+import DOM.WebStorage.Internal.Foreign (ForeignStorage, STORAGE) as Exports
 import DOM.WebStorage.Internal.Generic (TranscodeG) as Exports
 import DOM.WebStorage.JSON
   ( class JSONStorage
@@ -16,6 +16,6 @@ import DOM.WebStorage.JSON
   , updateItem
   , updateItem'
   ) as Exports
-import DOM.WebStorage.Local (LocalStorage, getLocalStorage) as Exports
-import DOM.WebStorage.Mock (MockStorage, newMockStorage) as Exports
-import DOM.WebStorage.Session (SessionStorage, getSessionStorage) as Exports
+import DOM.WebStorage.Local (getLocalStorage) as Exports
+import DOM.WebStorage.Mock (newMockStorage) as Exports
+import DOM.WebStorage.Session (getSessionStorage) as Exports

@@ -1,23 +1,12 @@
-module DOM.WebStorage.String
-( module Exports
-, class StrStorage
-, length
-, key
-, getItem
-, setItem
-, removeItem
-, clear
-, updateItem
-, updateItem'
-) where
+module DOM.WebStorage.String where
 
 import Prelude
 
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe)
 
-import DOM.WebStorage.Internal.Foreign (STORAGE, Updated)
-import DOM.WebStorage.Internal.Foreign (STORAGE) as Exports
+import DOM.WebStorage.Internal.Foreign (ForeignStorage, STORAGE, Updated)
+import DOM.WebStorage.Internal.Foreign as Foreign
 
 class StrStorage s where
   length :: forall e. s -> Eff (storage :: STORAGE | e) Int
@@ -26,6 +15,14 @@ class StrStorage s where
   setItem :: forall e. s -> String -> String -> Eff (storage :: STORAGE | e) Unit
   removeItem :: forall e. s -> String -> Eff (storage :: STORAGE | e) Unit
   clear :: forall e. s -> Eff (storage :: STORAGE | e) Unit
+
+instance strStorageForeignStorage :: StrStorage ForeignStorage where
+  length = Foreign.length
+  key = Foreign.key
+  getItem = Foreign.getItem
+  setItem = Foreign.setItem
+  removeItem = Foreign.removeItem
+  clear = Foreign.clear
 
 updateItem :: forall e s. StrStorage s
   => s -> String -> (Maybe String -> String) -> Eff (storage :: STORAGE | e) String

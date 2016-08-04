@@ -1,6 +1,6 @@
 "use strict";
 
-exports.mockStorageImpl = function(){
+exports.newMockStorage = function(){
   var storage = {};
   return {
     get length() {

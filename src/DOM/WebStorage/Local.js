@@ -1,5 +1,5 @@
 "use strict";
 
-exports.localStorageImpl = function() {
+exports.getLocalStorage = function() {
   return window.localStorage;
 }
