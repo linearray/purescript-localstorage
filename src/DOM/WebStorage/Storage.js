@@ -1,6 +1,14 @@
 "use strict";
 
-exports.newMockStorage = function(){
+exports.getLocalStorage = function() {
+  return window.localStorage;
+}
+
+exports.getSessionStorage = function() {
+  return window.sessionStorage;
+}
+
+exports.newMockStorage = function() {
   var storage = {};
   return {
     get length() {
