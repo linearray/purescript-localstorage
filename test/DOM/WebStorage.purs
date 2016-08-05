@@ -4,7 +4,7 @@ import Prelude
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.Ref (REF)
+import Control.Monad.Eff.Ref (REF, modifyRef')
 import Data.Argonaut.Core (foldJsonBoolean)
 import Data.Argonaut.Decode (class DecodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
@@ -18,6 +18,7 @@ import DOM.WebStorage
   , STORAGE
   , clear
   , getItem
+  , getItemRef
   , length
   , newMockStorage
   , removeItem
@@ -62,6 +63,12 @@ testWebStorage = do
   testSetItemJ storage itemJKey (ItemJ false)
   testUpdateItemJ storage itemJKey (const (ItemJ (true)))
   testSetItemG storage itemGKey (ItemG true)
+  do -- FIXME: break up into suites
+    log "GenericStorage.getItemRef"
+    atom <- getItemRef storage itemGKey (ItemG false)
+    let update state@(ItemG flag) = { state, value: flag}
+    wasTrue <- modifyRef' atom update
+    assert wasTrue
   testUpdateItemG storage itemGKey (const (ItemG (false)))
   testRemoveItem storage itemGKey
   testRemoveItem storage itemGKey

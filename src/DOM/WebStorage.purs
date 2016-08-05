@@ -2,6 +2,7 @@ module DOM.WebStorage (module Exports) where
 
 import DOM.WebStorage.Generic
   ( getItem
+  , getItemRef
   , removeItem
   , setItem
   , updateItem
