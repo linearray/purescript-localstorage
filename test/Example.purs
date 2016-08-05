@@ -8,7 +8,7 @@ import Data.Generic (class Generic, gShow)
 import Data.Maybe (maybe)
 import DOM (DOM)
 
-import DOM.WebStorage (STORAGE, TranscodeG, gGetItem, gSetItem, getLocalStorage)
+import DOM.WebStorage (STORAGE, getItem, setItem, getLocalStorage)
 
 -- 1. Define item types to store.
 newtype UserConfig = UserConfig { name :: String, email :: String }
@@ -24,10 +24,10 @@ data ExampleKey a = UserConfigKey | ServerCacheKey
 derive instance genericExampleKey :: Generic (ExampleKey a)
 
 -- 4. Make "smart constructor" for each key.
-userConfigKey :: ExampleKey (TranscodeG UserConfig)
+userConfigKey :: ExampleKey UserConfig
 userConfigKey = UserConfigKey
 
-serverCacheKey :: ExampleKey (TranscodeG ServerCache)
+serverCacheKey :: ExampleKey ServerCache
 serverCacheKey = ServerCacheKey
 
 {- 5. Optionally ask the tooth fairy for a GADT under your pillow.
@@ -41,7 +41,7 @@ main :: Eff (console :: CONSOLE, storage :: STORAGE, dom :: DOM) Unit
 main = do
   let userConfig = UserConfig { name : "PureScript", email : "purescript@example.com" }
   localStorage <- getLocalStorage
-  gSetItem localStorage userConfigKey userConfig
-  result <- gGetItem localStorage userConfigKey
+  setItem localStorage userConfigKey userConfig
+  result <- getItem localStorage userConfigKey
   -- result <- gUpdateItem localStorage userConfigKey -- read and write in one
   log $ maybe "Are you Private Browsing in Safari?" gShow result

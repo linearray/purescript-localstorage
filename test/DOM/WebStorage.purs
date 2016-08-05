@@ -1,4 +1,4 @@
-module Test.DOM.WebStorage (testJSONStorage) where
+module Test.DOM.WebStorage (testWebStorage) where
 
 import Prelude
 
@@ -14,20 +14,17 @@ import Data.Maybe (Maybe(..), maybe)
 import Test.Assert (ASSERT, assert)
 
 import DOM.WebStorage
-  ( class JSONStorage
-  , TranscodeG
+  ( ForeignStorage
   , STORAGE
   , clear
-  , removeItem
   , getItem
   , length
-  , gUpdateItem
-  , updateItem
-  , gSetItem
-  , setItem
-  , gGetItem
   , newMockStorage
+  , removeItem
+  , setItem
+  , updateItem
   )
+import DOM.WebStorage.JSON as JSONStorage
 
 type EffStorageRef = Eff (console :: CONSOLE, assert :: ASSERT, storage :: STORAGE, ref :: REF) Unit
 
@@ -37,113 +34,113 @@ derive instance genericItemG :: Generic ItemG
 instance eqItemG :: Eq ItemG where
   eq = gEq
 
-newtype ItemN = ItemN Boolean
+newtype ItemJ = ItemJ Boolean
 
-instance eqItemN :: Eq ItemN where
-  eq (ItemN item1) (ItemN item2) = item1 `eq` item2
+instance eqItemJ :: Eq ItemJ where
+  eq (ItemJ item1) (ItemJ item2) = item1 `eq` item2
 
-instance encodeItemN :: EncodeJson ItemN where
-  encodeJson (ItemN item) = encodeJson item
+instance encodeItemJ :: EncodeJson ItemJ where
+  encodeJson (ItemJ item) = encodeJson item
 
-instance decodeItemN :: DecodeJson ItemN where
-  decodeJson = map ItemN <<< foldJsonBoolean (Left "Value is not a ItemN") Right
+instance decodeItemJ :: DecodeJson ItemJ where
+  decodeJson = map ItemJ <<< foldJsonBoolean (Left "Value is not a ItemJ") Right
 
-data ItemKey a = ItemGKey | ItemNKey
+data ItemKey a = ItemGKey | ItemJKey
 derive instance genericItemKey :: Generic (ItemKey a)
 
-itemGKey :: ItemKey (TranscodeG ItemG)
+itemGKey :: ItemKey ItemG
 itemGKey = ItemGKey
 
-itemNKey :: ItemKey ItemN
-itemNKey = ItemNKey
+itemJKey :: ItemKey ItemJ
+itemJKey = ItemJKey
 
-testJSONStorage :: EffStorageRef
-testJSONStorage = do
+testWebStorage :: EffStorageRef
+testWebStorage = do
   storage <- newMockStorage
   testLength storage 0
   testClear storage
-  testSetItem storage itemNKey (ItemN false)
-  testUpdateItem storage itemNKey (const (ItemN (true)))
-  testGSetItem storage itemGKey (ItemG true)
-  testGUpdateItem storage itemGKey (const (ItemG (false)))
+  testSetItemJ storage itemJKey (ItemJ false)
+  testUpdateItemJ storage itemJKey (const (ItemJ (true)))
+  testSetItemG storage itemGKey (ItemG true)
+  testUpdateItemG storage itemGKey (const (ItemG (false)))
   testRemoveItem storage itemGKey
   testRemoveItem storage itemGKey
-  testGetItem storage itemNKey (Just (ItemN true))
+  testGetItemJ storage itemJKey (Just (ItemJ true))
   testClear storage
-  testGetItem storage itemNKey Nothing
+  testGetItemJ storage itemJKey Nothing
 
-testLength :: forall s. JSONStorage s => s -> Int -> EffStorageRef
+testLength :: ForeignStorage -> Int -> EffStorageRef
 testLength storage expectedLength = do
-  log "length"
+  log "GenericStorage.length"
   length <- length storage
   assert $ length == expectedLength
 
-testGetItem :: forall s a. (JSONStorage s, Eq a, DecodeJson a)
-  => s -> ItemKey a -> Maybe a -> EffStorageRef
-testGetItem storage key expectedResult = do
-  log "getItem"
+testGetItemG :: forall a. (Eq a, Generic a)
+  => ForeignStorage -> ItemKey a -> Maybe a -> EffStorageRef
+testGetItemG storage key expectedResult = do
+  log "GenericStorage.getItem"
   result <- getItem storage key
   assert $ result == expectedResult
 
-testGGetItem :: forall s a. (JSONStorage s, Eq a, Generic a)
-  => s -> ItemKey (TranscodeG a) -> Maybe a -> EffStorageRef
-testGGetItem storage key expectedResult = do
-  log "gGetItem"
-  result <- gGetItem storage key
+testGetItemJ :: forall a. (Eq a, DecodeJson a)
+  => ForeignStorage -> ItemKey a -> Maybe a -> EffStorageRef
+testGetItemJ storage key expectedResult = do
+  log "JSONStorage.getItem"
+  result <- JSONStorage.getItem storage key
   assert $ result == expectedResult
 
-testSetItem :: forall s a.  (JSONStorage s, Eq a, DecodeJson a, EncodeJson a)
-  => s -> ItemKey a -> a -> EffStorageRef
-testSetItem storage key item = do
-  log "setItem"
+testSetItemG :: forall a. (Eq a, Generic a)
+  => ForeignStorage -> ItemKey a -> a -> EffStorageRef
+testSetItemG storage key item = do
+  log "GenericStorage.setItem"
   length <- length storage
   result <- getItem storage key
   setItem storage key item
-  testGetItem storage key (Just item)
+  testGetItemG storage key (Just item)
   testLength storage $ maybe (length + 1) (const length) result
 
-testGSetItem :: forall s a.  (JSONStorage s, Eq a, Generic a)
-  => s -> ItemKey (TranscodeG a) -> a -> EffStorageRef
-testGSetItem storage key item = do
-  log "gSetItem"
+testSetItemJ :: forall a. (Eq a, DecodeJson a, EncodeJson a)
+  => ForeignStorage -> ItemKey a -> a -> EffStorageRef
+testSetItemJ storage key item = do
+  log "JSONStorage.setItem"
   length <- length storage
-  result <- getItem storage key
-  gSetItem storage key item
-  testGGetItem storage key (Just item)
+  result <- JSONStorage.getItem storage key
+  JSONStorage.setItem storage key item
+  testGetItemJ storage key (Just item)
   testLength storage $ maybe (length + 1) (const length) result
 
-testUpdateItem :: forall s a.  (JSONStorage s, Eq a, DecodeJson a, EncodeJson a)
-  => s -> ItemKey a -> (Maybe a -> a) -> EffStorageRef
-testUpdateItem storage key update = do
-  log "updateItem"
+testUpdateItemG :: forall a. (Eq a, Generic a)
+  => ForeignStorage -> ItemKey a -> (Maybe a -> a) -> EffStorageRef
+testUpdateItemG storage key update = do
+  log "GenericStorage.UpdateItem"
   length <- length storage
   result <- getItem storage key
   updateItem storage key update
-  testGetItem storage key (Just (update result))
+  testGetItemG storage key (Just (update result))
   testLength storage $ maybe (length + 1) (const length) result
 
-testGUpdateItem :: forall s a.  (JSONStorage s, Eq a, Generic a)
-  => s -> ItemKey (TranscodeG a) -> (Maybe a -> a) -> EffStorageRef
-testGUpdateItem storage key update = do
-  log "gUpdateItem"
+testUpdateItemJ :: forall a. (Eq a, DecodeJson a, EncodeJson a)
+  => ForeignStorage -> ItemKey a -> (Maybe a -> a) -> EffStorageRef
+testUpdateItemJ storage key update = do
+  log "JSONStorage.updateItem"
   length <- length storage
-  result <- gGetItem storage key
-  gUpdateItem storage key update
-  testGGetItem storage key (Just (update result))
+  result <- JSONStorage.getItem storage key
+  JSONStorage.updateItem storage key update
+  testGetItemJ storage key (Just (update result))
   testLength storage $ maybe (length + 1) (const length) result
 
-testRemoveItem :: forall s a. (JSONStorage s, Eq a, DecodeJson a)
-  => s -> ItemKey a -> EffStorageRef
+testRemoveItem :: forall a. (Eq a, Generic a)
+  => ForeignStorage -> ItemKey a -> EffStorageRef
 testRemoveItem storage key = do
-  log "removeItem"
+  log "GenericStorage.removeItem"
   length <- length storage
   result <- getItem storage key
   removeItem storage key
-  testGetItem storage key Nothing
+  testGetItemG storage key Nothing
   testLength storage $ maybe length (const (length - 1)) result
 
-testClear :: forall s. JSONStorage s => s -> EffStorageRef
+testClear :: ForeignStorage -> EffStorageRef
 testClear storage = do
-  log "clear"
+  log "GenericStorage.clear"
   clear storage
   testLength storage 0

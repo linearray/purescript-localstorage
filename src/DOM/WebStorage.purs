@@ -1,14 +1,9 @@
 module DOM.WebStorage (module Exports) where
 
 import DOM.WebStorage.Internal.Foreign (ForeignStorage, STORAGE) as Exports
-import DOM.WebStorage.Internal.Generic (TranscodeG) as Exports
-import DOM.WebStorage.JSON
-  ( class JSONStorage
+import DOM.WebStorage.Generic
+  ( class GenericStorage
   , clear
-  , gGetItem
-  , gSetItem
-  , gUpdateItem
-  , gUpdateItem'
   , getItem
   , length
   , removeItem
