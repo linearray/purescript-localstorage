@@ -8,8 +8,6 @@ module DOM.WebStorage.String
 , clear
 , getItemRef
 , getItemRef'
-, updateItem
-, updateItem'
 ) where
 
 import Data.Function.Eff
@@ -17,7 +15,7 @@ import Data.Function.Eff
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Ref (Ref)
 import Data.Maybe (Maybe(..))
-import Prelude (Unit, bind, id, pure, (<$>), (<<<))
+import Prelude (Unit, id)
 
 import DOM.WebStorage.Storage (ForeignStorage, STORAGE)
 
@@ -47,19 +45,6 @@ getItemRef storage key' = getItemRef' storage key' id id
 getItemRef' :: forall e a. ForeignStorage -> String
   -> (a -> String) -> (String -> a) -> a -> Eff (storage :: STORAGE | e) (Ref a)
 getItemRef' = runEffFn5 getItemRefImpl
-
-updateItem :: forall e. ForeignStorage -> String
-  -> (Maybe String -> String) -> Eff (storage :: STORAGE | e) String
-updateItem storage key' update = updateItem' storage key' update'
-  where
-    update' = (\newValue -> { newValue, returnValue: newValue }) <<< update
-
-updateItem' :: forall e b. ForeignStorage -> String
-  -> (Maybe String -> Updated String b) -> Eff (storage :: STORAGE | e) b
-updateItem' storage key' update = do
-  updated <- update <$> getItem storage key'
-  setItem storage key' updated.newValue
-  pure updated.returnValue
 
 foreign import lengthImpl :: forall e. EffFn1 (storage :: STORAGE | e)
   ForeignStorage Int

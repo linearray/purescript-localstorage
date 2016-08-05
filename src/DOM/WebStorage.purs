@@ -5,8 +5,6 @@ import DOM.WebStorage.Generic
   , getItemRef
   , removeItem
   , setItem
-  , updateItem
-  , updateItem'
   ) as Exports
 import DOM.WebStorage.Storage
   ( ForeignStorage
