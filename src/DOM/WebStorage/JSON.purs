@@ -22,7 +22,7 @@ getItem storage key = (parse =<< _) <$> getItem' key
 
 setItem :: forall e key a. (Generic (key a), EncodeJson a)
   => ForeignStorage -> key a -> a -> Eff (storage :: STORAGE | e) Unit
-setItem storage key item = setItem' key (stringify item)
+setItem storage key = setItem' key <<< stringify
   where
     setItem' = Internal.setItem storage <<< gShow
     stringify = show <<< encodeJson
