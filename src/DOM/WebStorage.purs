@@ -1,6 +1,5 @@
 module DOM.WebStorage (module Exports) where
 
-import DOM.WebStorage.Internal.Foreign (ForeignStorage, STORAGE) as Exports
 import DOM.WebStorage.Generic
   ( class GenericStorage
   , clear
@@ -11,6 +10,7 @@ import DOM.WebStorage.Generic
   , updateItem
   , updateItem'
   ) as Exports
+import DOM.WebStorage.Internal (ForeignStorage, STORAGE) as Exports
 import DOM.WebStorage.Local (getLocalStorage) as Exports
 import DOM.WebStorage.Mock (newMockStorage) as Exports
 import DOM.WebStorage.Session (getSessionStorage) as Exports

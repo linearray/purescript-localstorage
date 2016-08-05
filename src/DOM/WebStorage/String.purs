@@ -5,8 +5,8 @@ import Prelude
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe)
 
-import DOM.WebStorage.Internal.Foreign (ForeignStorage, STORAGE, Updated)
-import DOM.WebStorage.Internal.Foreign as Foreign
+import DOM.WebStorage.Internal (ForeignStorage, STORAGE, Updated)
+import DOM.WebStorage.Internal as Internal
 
 class StrStorage s where
   length :: forall e. s -> Eff (storage :: STORAGE | e) Int
@@ -17,12 +17,12 @@ class StrStorage s where
   clear :: forall e. s -> Eff (storage :: STORAGE | e) Unit
 
 instance strStorageForeignStorage :: StrStorage ForeignStorage where
-  length = Foreign.length
-  key = Foreign.key
-  getItem = Foreign.getItem
-  setItem = Foreign.setItem
-  removeItem = Foreign.removeItem
-  clear = Foreign.clear
+  length = Internal.length
+  key = Internal.key
+  getItem = Internal.getItem
+  setItem = Internal.setItem
+  removeItem = Internal.removeItem
+  clear = Internal.clear
 
 updateItem :: forall e s. StrStorage s
   => s -> String -> (Maybe String -> String) -> Eff (storage :: STORAGE | e) String

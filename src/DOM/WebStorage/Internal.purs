@@ -1,4 +1,4 @@
-module DOM.WebStorage.Internal.Foreign where
+module DOM.WebStorage.Internal where
 
 import Data.Function.Eff
 

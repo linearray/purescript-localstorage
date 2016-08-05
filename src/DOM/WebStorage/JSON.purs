@@ -10,7 +10,7 @@ import Data.Either (either)
 import Data.Generic (class Generic, gShow)
 import Data.Maybe (Maybe(..))
 
-import DOM.WebStorage.Internal.Foreign (STORAGE, Updated)
+import DOM.WebStorage.Internal (STORAGE, Updated)
 import DOM.WebStorage.String (class StrStorage)
 import DOM.WebStorage.String as StrStorage
 
