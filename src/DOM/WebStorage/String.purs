@@ -8,31 +8,35 @@ import Data.Maybe (Maybe)
 import DOM.WebStorage.Internal (ForeignStorage, STORAGE, Updated)
 import DOM.WebStorage.Internal as Internal
 
-class StrStorage s where
-  length :: forall e. s -> Eff (storage :: STORAGE | e) Int
-  key :: forall e. s -> Int -> Eff (storage :: STORAGE | e) (Maybe String)
-  getItem :: forall e. s -> String -> Eff (storage :: STORAGE | e) (Maybe String)
-  setItem :: forall e. s -> String -> String -> Eff (storage :: STORAGE | e) Unit
-  removeItem :: forall e. s -> String -> Eff (storage :: STORAGE | e) Unit
-  clear :: forall e. s -> Eff (storage :: STORAGE | e) Unit
+length :: forall e. ForeignStorage -> Eff (storage :: STORAGE | e) Int
+length = Internal.length
 
-instance strStorageForeignStorage :: StrStorage ForeignStorage where
-  length = Internal.length
-  key = Internal.key
-  getItem = Internal.getItem
-  setItem = Internal.setItem
-  removeItem = Internal.removeItem
-  clear = Internal.clear
+key :: forall e. ForeignStorage -> Int -> Eff (storage :: STORAGE | e) (Maybe String)
+key = Internal.key
 
-updateItem :: forall e s. StrStorage s
-  => s -> String -> (Maybe String -> String) -> Eff (storage :: STORAGE | e) String
-updateItem storage key update = updateItem' storage key update'
+getItem :: forall e. ForeignStorage -> String -> Eff (storage :: STORAGE | e) (Maybe String)
+getItem = Internal.getItem
+
+setItem :: forall e. ForeignStorage -> String -> String -> Eff (storage :: STORAGE | e) Unit
+setItem = Internal.setItem
+
+removeItem :: forall e. ForeignStorage -> String -> Eff (storage :: STORAGE | e) Unit
+removeItem = Internal.removeItem
+
+clear :: forall e. ForeignStorage -> Eff (storage :: STORAGE | e) Unit
+clear = Internal.clear
+
+updateItem :: forall e
+   . ForeignStorage -> String -> (Maybe String -> String)
+  -> Eff (storage :: STORAGE | e) String
+updateItem storage key' update = updateItem' storage key' update'
   where
     update' = (\newValue -> { newValue, returnValue: newValue }) <<< update
 
-updateItem' :: forall e s b. StrStorage s
-  => s -> String -> (Maybe String -> Updated String b) -> Eff (storage :: STORAGE | e) b
-updateItem' storage key update = do
-  updated <- update <$> getItem storage key
-  setItem storage key updated.newValue
+updateItem' :: forall e b
+   . ForeignStorage -> String -> (Maybe String -> Updated String b)
+  -> Eff (storage :: STORAGE | e) b
+updateItem' storage key' update = do
+  updated <- update <$> getItem storage key'
+  setItem storage key' updated.newValue
   pure updated.returnValue

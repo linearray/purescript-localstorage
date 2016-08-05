@@ -10,41 +10,31 @@ import Data.Either (either)
 import Data.Generic (class Generic, gShow)
 import Data.Maybe (Maybe(..))
 
-import DOM.WebStorage.Internal (STORAGE, Updated)
-import DOM.WebStorage.String (class StrStorage)
-import DOM.WebStorage.String as StrStorage
+import DOM.WebStorage.Internal (ForeignStorage, STORAGE, Updated)
+import DOM.WebStorage.Internal as Internal
 
-class JSONStorage s where
-  length :: forall e. s -> Eff (storage :: STORAGE | e) Int
-  getItem :: forall e key a. (Generic (key a), DecodeJson a)
-    => s -> key a -> Eff (storage :: STORAGE | e) (Maybe a)
-  setItem :: forall e key a. (Generic (key a), EncodeJson a)
-    => s -> key a -> a -> Eff (storage :: STORAGE | e) Unit
-  removeItem :: forall e key a. Generic (key a)
-    => s -> key a -> Eff (storage :: STORAGE | e) Unit
-  clear :: forall e. s -> Eff (storage :: STORAGE | e) Unit
+getItem :: forall e key a. (Generic (key a), DecodeJson a)
+  => ForeignStorage -> key a -> Eff (storage :: STORAGE | e) (Maybe a)
+getItem storage key = (parse =<< _) <$> getItem' key
+  where
+    getItem' = Internal.getItem storage <<< gShow
+    parse = either (const Nothing) Just <<< (decodeJson <=< jsonParser)
 
-instance jsonStorageStrStorage :: StrStorage s => JSONStorage s where
-  length = StrStorage.length
-  getItem storage key = (parse =<< _) <$> getItem' key
-    where
-      getItem' = StrStorage.getItem storage <<< gShow
-      parse = either (const Nothing) Just <<< (decodeJson <=< jsonParser)
-  setItem storage key item = setItem' key (stringify item)
-    where
-      setItem' = StrStorage.setItem storage <<< gShow
-      stringify = show <<< encodeJson
-  removeItem storage = StrStorage.removeItem storage <<< gShow
-  clear = StrStorage.clear
+setItem :: forall e key a. (Generic (key a), EncodeJson a)
+  => ForeignStorage -> key a -> a -> Eff (storage :: STORAGE | e) Unit
+setItem storage key item = setItem' key (stringify item)
+  where
+    setItem' = Internal.setItem storage <<< gShow
+    stringify = show <<< encodeJson
 
-updateItem :: forall e s key a. (JSONStorage s, Generic (key a), EncodeJson a, DecodeJson a)
-  => s -> key a -> (Maybe a -> a) -> Eff (storage :: STORAGE | e) a
+updateItem :: forall e key a. (Generic (key a), EncodeJson a, DecodeJson a)
+  => ForeignStorage -> key a -> (Maybe a -> a) -> Eff (storage :: STORAGE | e) a
 updateItem storage key update = updateItem' storage key update'
   where
     update' = (\newValue -> { newValue, returnValue: newValue }) <<< update
 
-updateItem' :: forall e s key a b. (JSONStorage s, Generic (key a), EncodeJson a, DecodeJson a)
-  => s -> key a -> (Maybe a -> Updated a b) -> Eff (storage :: STORAGE | e) b
+updateItem' :: forall e key a b. (Generic (key a), EncodeJson a, DecodeJson a)
+  => ForeignStorage -> key a -> (Maybe a -> Updated a b) -> Eff (storage :: STORAGE | e) b
 updateItem' storage key update = do
   updated <- update <$> getItem storage key
   setItem storage key updated.newValue
