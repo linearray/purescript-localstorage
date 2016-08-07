@@ -6,16 +6,16 @@ module DOM.WebStorage.String
 , setItem
 , removeItem
 , clear
-, getItemRef
-, getItemRef'
+, getItemVar
+, getItemVar'
 ) where
 
 import Data.Function.Eff
 
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Ref (Ref)
-import Data.Maybe (Maybe(..))
-import Prelude (Unit, id)
+import Data.Maybe (Maybe(..), maybe)
+import Prelude (Unit, id, (<<<), (<$>))
+import Control.Monad.Eff.Var (Var, makeVar)
 
 import DOM.WebStorage.Storage (ForeignStorage, STORAGE)
 
@@ -39,12 +39,15 @@ removeItem = runEffFn2 removeItemImpl
 clear :: forall e. ForeignStorage -> Eff (storage :: STORAGE | e) Unit
 clear = runEffFn1 clearImpl
 
-getItemRef :: forall e. ForeignStorage -> String -> String -> Eff (storage :: STORAGE | e) (Ref String)
-getItemRef storage key' = getItemRef' storage key' id id
+getItemVar :: forall e. ForeignStorage -> String -> String -> Var (storage :: STORAGE | e) String
+getItemVar storage key' = getItemVar' storage key' id id
 
-getItemRef' :: forall e a. ForeignStorage -> String
-  -> (a -> String) -> (String -> a) -> a -> Eff (storage :: STORAGE | e) (Ref a)
-getItemRef' = runEffFn5 getItemRefImpl
+getItemVar' :: forall e a. ForeignStorage -> String
+  -> (a -> String) -> (String -> a) -> a -> Var (storage :: STORAGE | e) a
+getItemVar' storage key' encode decode defaultItem = makeVar getItem' setItem'
+  where
+    getItem' = maybe defaultItem decode <$> getItem storage key'
+    setItem' = setItem storage key' <<< encode
 
 foreign import lengthImpl :: forall e. EffFn1 (storage :: STORAGE | e)
   ForeignStorage Int
@@ -58,5 +61,3 @@ foreign import removeItemImpl :: forall e. EffFn2 (storage :: STORAGE | e)
   ForeignStorage String Unit
 foreign import clearImpl :: forall e. EffFn1 (storage :: STORAGE | e)
   ForeignStorage Unit
-foreign import getItemRefImpl :: forall e a. EffFn5 (storage :: STORAGE | e)
-  ForeignStorage String (a -> String) (String -> a) a (Ref a)

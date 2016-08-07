@@ -2,7 +2,7 @@ module DOM.WebStorage (module Exports) where
 
 import DOM.WebStorage.Generic
   ( getItem
-  , getItemRef
+  , getItemVar
   , removeItem
   , setItem
   ) as Exports
@@ -11,7 +11,6 @@ import DOM.WebStorage.Storage
   , STORAGE
   , getLocalStorage
   , getSessionStorage
-  , newMockStorage
   ) as Exports
 import DOM.WebStorage.String
   ( clear

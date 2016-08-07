@@ -1,18 +1,20 @@
-module Spec.DOM.WebStorage.Ref where
+module Spec.DOM.WebStorage.Var where
 
 import Prelude
 
-import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Ref (REF, writeRef, readRef)
+import Control.Monad.Aff (Aff)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Class (liftEff) as Eff
+import Control.Monad.Eff.Var (get, ($=))
 import Data.Maybe (maybe)
 import Test.Spec (Spec, describe, it)
 import Test.Spec.Assertions (shouldEqual)
 
-import DOM.WebStorage (ForeignStorage, STORAGE, getItem, getItemRef, length, removeItem)
+import DOM.WebStorage (ForeignStorage, STORAGE, getItem, getItemVar, length, removeItem)
 import Spec.DOM.WebStorage.Util (ItemG(..), clearSpec, itemGKey, testLength)
 
-spec :: forall e. ForeignStorage -> Spec (storage :: STORAGE, ref :: REF | e) Unit
-spec storage = describe "Ref" do
+spec :: forall e. ForeignStorage -> Spec (storage :: STORAGE | e) Unit
+spec storage = describe "Var" do
   clearSpec' "starts empty"
   clearSpec' "remains empty"
   setItemSpec itemGKey (ItemG false) "creates item"
@@ -25,15 +27,13 @@ spec storage = describe "Ref" do
     testLength' = testLength storage
 
     testGetItem key expectedItem = do
-      itemRef <- liftEff $ getItemRef' key
-      item <- liftEff $ readRef itemRef
+      item <- liftEff $ get (getItemVar' key)
       item `shouldEqual` expectedItem
 
     setItemSpec key item desc = it ("setItem " <> desc) do
       length <- liftEff $ length storage
       result <- liftEff $ getItem storage key
-      itemRef <- liftEff $ getItemRef' key
-      liftEff $ writeRef itemRef item
+      liftEff $ getItemVar' key $= item
       testGetItem key item
       testLength' (maybe GT (const EQ) result) length -- increments
 
@@ -46,4 +46,7 @@ spec storage = describe "Ref" do
 
     clearSpec' = clearSpec storage
 
-    getItemRef' key = getItemRef storage key (ItemG false)
+    getItemVar' key = getItemVar storage key (ItemG false)
+
+    -- purescript/purescript#2061
+    liftEff = Eff.liftEff :: forall eff a. Eff eff a -> Aff eff a

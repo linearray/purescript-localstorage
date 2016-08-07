@@ -43,5 +43,4 @@ main = do
   localStorage <- getLocalStorage
   setItem localStorage userConfigKey userConfig
   result <- getItem localStorage userConfigKey
-  -- result <- gUpdateItem localStorage userConfigKey -- read and write in one
   log $ maybe "Are you Private Browsing in Safari?" gShow result

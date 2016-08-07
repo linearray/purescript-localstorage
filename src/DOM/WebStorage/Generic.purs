@@ -2,13 +2,13 @@ module DOM.WebStorage.Generic
 ( getItem
 , setItem
 , removeItem
-, getItemRef
+, getItemVar
 ) where
 
 import Prelude
 
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Ref (Ref)
+import Control.Monad.Eff.Var (Var)
 import Data.Argonaut.Decode (gDecodeJson)
 import Data.Argonaut.Encode (gEncodeJson)
 import Data.Argonaut.Parser (jsonParser)
@@ -35,11 +35,11 @@ removeItem :: forall e key a. Generic (key a)
   => ForeignStorage -> key a -> Eff (storage :: STORAGE | e) Unit
 removeItem storage = String.removeItem storage <<< gShow
 
-getItemRef :: forall e key a. (Generic (key a), Generic a)
-  => ForeignStorage -> key a -> a -> Eff (storage :: STORAGE | e) (Ref a)
-getItemRef storage key defaultItem = getItemRef' key defaultItem
+getItemVar :: forall e key a. (Generic (key a), Generic a)
+  => ForeignStorage -> key a -> a -> Var (storage :: STORAGE | e) a
+getItemVar storage key defaultItem = getItemVar' key stringify (parse defaultItem id) defaultItem
   where
-    getItemRef' key = String.getItemRef' storage (gShow key) stringify (parse defaultItem id)
+    getItemVar' = String.getItemVar' storage <<< gShow
 
 stringify :: forall a. Generic a => a -> String
 stringify = show <<< gEncodeJson

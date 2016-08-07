@@ -19,7 +19,7 @@
     "purescript-argonaut-core": "^1.0.0",
     "purescript-dom": "^2.0.0",
     "purescript-eff-functions": "^1.0.0",
-    "purescript-refs": "^1.0.0"
+    "purescript-var": "^0.2.0"
   },
   "devDependencies": {
     "purescript-spec": "^0.8.0"
