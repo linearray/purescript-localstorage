@@ -12,7 +12,8 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "output"
+    "output",
+    "test"
   ],
   "dependencies": {
     "purescript-argonaut-codecs": "^1.0.0",

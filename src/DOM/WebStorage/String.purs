@@ -14,7 +14,7 @@ import Data.Function.Eff
 
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe(..), maybe)
-import Prelude (Unit, id, (<<<), (<$>))
+import Prelude (Unit, id, (<$>), (<<<))
 import Control.Monad.Eff.Var (Var, makeVar)
 
 import DOM.WebStorage.Storage (ForeignStorage, STORAGE)
