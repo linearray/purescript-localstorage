@@ -30,10 +30,11 @@ userConfigKey = UserConfigKey
 serverCacheKey :: ExampleKey ServerCache
 serverCacheKey = ServerCacheKey
 
+
 {- 5. Optionally ask the tooth fairy for a GADT under your pillow.
 data ExampleKey a where
-  UserConfig :: ExampleKey (TranscodeG UserConfig)
-  ServerCache :: ExampleKey (TranscodeG ServerCache)
+  UserConfig :: ExampleKey UserConfig
+  ServerCache :: ExampleKey ServerCache
 -}
 
 -- 6. Run in browser.
