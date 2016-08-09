@@ -1,6 +1,6 @@
 # purescript-localstorage
 
-[![Build Status](https://travis-ci.org/eskimor/purescript-local-storage.svg?branch=master)](https://travis-ci.org/gonimo/purescript-local-storage)
+[![Build Status](https://travis-ci.org/eskimor/purescript-local-storage.svg?branch=master)](https://travis-ci.org/eskimor/purescript-local-storage)
 
 Access JS webstorage (local &amp; session) in a typesafe and convenient way.
 Just define a key type with some smart constructors and you are done
