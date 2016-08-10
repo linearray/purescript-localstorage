@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/eskimor/purescript-localstorage.svg?branch=master)](https://travis-ci.org/eskimor/purescript-localstorage)
 
-Access JS webstorage (local &amp; session) in a typesafe and convenient way.
+Access JS webstorage (local &amp; session) in a type-safe and convenient way.
 Just define a key type with some smart constructors and you are done
 (GADTs would even make those unnecessary).
 
@@ -15,6 +15,11 @@ In addition to type safety, having a key type instead of plain strings
 also makes the API easier to use, because with the value type encoded
 in the key type, type inference is always possible, even for a plain
 `getItem` call. You will never need any type annotations!
+
+The values you want to store should have a Generic instance, then
+everything just works. Alternatively, if your type is not `Generic`, you can provide
+`EncodeJson` and `DecodeJson` instances and use `getItem`, `setItem` and friends
+from `DOM.WebStorage.JSON`.
 
 Find a basic usage example in test/Example.purs, repeated here for convenience:
 
