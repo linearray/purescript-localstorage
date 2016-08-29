@@ -27,7 +27,7 @@ exports.newMockStorage = function() {
       delete storage[key];
     },
     clear: function() {
-      Object.keys(storage).forEach(this.removeItem, this);
+      storage = {};
     }
   };
 };

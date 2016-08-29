@@ -16,15 +16,12 @@ exports.getItemImpl = function(nothing, just, storage, key) {
 
 exports.setItemImpl = function(storage, key, item) {
   storage.setItem(key, item);
-  return {};
 };
 
 exports.removeItemImpl = function(storage, key) {
   storage.removeItem(key);
-  return {};
 };
 
 exports.clearImpl = function(storage) {
   storage.clear();
-  return {};
 };
