@@ -20,7 +20,7 @@
     "purescript-argonaut-core": "^2.0.1",
     "purescript-dom": "^3.1.0",
     "purescript-eff-functions": "^2.0.0",
-    "purescript-var": "zudov/purescript-var#dc6238dbc20af0e3d53a5397b57c4c96b7040180"
+    "purescript-var": "^1.0.0" 
   },
   "devDependencies": {
     "purescript-spec": "^0.10.0"
