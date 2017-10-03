@@ -10,14 +10,14 @@ module DOM.WebStorage.String
 , getItemVar'
 ) where
 
-import Data.Function.Eff
+import Control.Monad.Eff.Uncurried
 
 import Control.Monad.Eff (Eff)
 import Data.Maybe (Maybe(..), maybe)
 import Prelude (Unit, id, (<$>), (<<<))
 import Control.Monad.Eff.Var (Var, makeVar)
 
-import DOM.WebStorage.Storage (ForeignStorage, STORAGE)
+import DOM.WebStorage.ForeignStorage (ForeignStorage, STORAGE)
 
 type Updated s b = { newValue :: s, returnValue :: b }
 
