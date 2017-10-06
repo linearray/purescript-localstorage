@@ -7,7 +7,7 @@ import DOM.WebStorage.Generic
   , removeItem
   , setItem
   ) as Exports
-import DOM.WebStorage.Storage
+import DOM.WebStorage.ForeignStorage
   ( ForeignStorage
   , STORAGE
   , getLocalStorage

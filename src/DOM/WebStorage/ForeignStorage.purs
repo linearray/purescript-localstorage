@@ -1,11 +1,11 @@
-module DOM.WebStorage.Storage where
+module DOM.WebStorage.ForeignStorage where
 
-import Control.Monad.Eff (Eff)
+import Control.Monad.Eff (Eff, kind Effect)
 import DOM (DOM)
 
-foreign import data STORAGE :: !
-foreign import data MOCK :: !
-foreign import data ForeignStorage :: *
+foreign import data STORAGE :: Effect
+foreign import data MOCK :: Effect
+foreign import data ForeignStorage :: Type
 
 foreign import getLocalStorage :: forall e. Eff (dom :: DOM | e) ForeignStorage
 foreign import getSessionStorage :: forall e. Eff (dom :: DOM | e) ForeignStorage
