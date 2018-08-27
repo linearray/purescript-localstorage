@@ -2,16 +2,16 @@ module Spec.DOM.WebStorage.JSON where
 
 import Prelude
 
-import Control.Monad.Eff.Class (liftEff)
-import Data.Maybe (Maybe(..), maybe)
-import Test.Spec (Spec, describe, it)
-import Test.Spec.Assertions (shouldEqual)
+import Effect.Class             (liftEffect)
+import Data.Maybe               (Maybe(..), maybe)
+import Test.Spec                (Spec, describe, it)
+import Test.Spec.Assertions     (shouldEqual)
 
-import DOM.WebStorage (ForeignStorage, STORAGE, length, removeItem)
-import DOM.WebStorage.JSON (getItem, setItem)
+import DOM.WebStorage           (ForeignStorage, length, removeItem)
+import DOM.WebStorage.JSON      (getItem, setItem)
 import Spec.DOM.WebStorage.Util (ItemJ(..), clearSpec, itemJKey, testLength)
 
-spec :: forall e. ForeignStorage -> Spec (storage :: STORAGE | e) Unit
+spec :: ForeignStorage -> Spec Unit
 spec storage = describe "JSON" do
   clearSpec' "starts empty"
   clearSpec' "remains empty"
@@ -25,20 +25,20 @@ spec storage = describe "JSON" do
     testLength' = testLength storage
 
     testGetItem key expectedResult = do
-      result <- liftEff $ getItem storage key
+      result <- liftEffect $ getItem storage key
       result `shouldEqual` expectedResult
 
     setItemSpec key item desc = it ("setItem " <> desc) do
-      length <- liftEff $ length storage
-      result <- liftEff $ getItem storage key
-      liftEff $ setItem storage key item
+      length <- liftEffect $ length storage
+      result <- liftEffect $ getItem storage key
+      liftEffect $ setItem storage key item
       testGetItem key (Just item)
       testLength' (maybe GT (const EQ) result) length -- increments
 
     removeItemSpec key desc = it ("removeItem " <> desc) do
-      length <- liftEff $ length storage
-      result <- liftEff $ getItem storage key
-      liftEff $ removeItem storage key
+      length <- liftEffect $ length storage
+      result <- liftEffect $ getItem storage key
+      liftEffect $ removeItem storage key
       testGetItem key Nothing
       testLength' (maybe EQ (const LT) result) length -- decrements
 

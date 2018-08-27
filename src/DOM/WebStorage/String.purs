@@ -6,58 +6,50 @@ module DOM.WebStorage.String
 , setItem
 , removeItem
 , clear
-, getItemVar
-, getItemVar'
+--, getItemVar
+--, getItemVar'
 ) where
 
-import Control.Monad.Eff.Uncurried
-
-import Control.Monad.Eff (Eff)
+import Effect.Uncurried
+import Effect
 import Data.Maybe (Maybe(..), maybe)
-import Prelude (Unit, id, (<$>), (<<<))
-import Control.Monad.Eff.Var (Var, makeVar)
+import Prelude    (Unit, identity, (<$>), (<<<))
 
-import DOM.WebStorage.ForeignStorage (ForeignStorage, STORAGE)
+import DOM.WebStorage.ForeignStorage (ForeignStorage)
 
 type Updated s b = { newValue :: s, returnValue :: b }
 
-length :: forall e. ForeignStorage -> Eff (storage :: STORAGE | e) Int
-length = runEffFn1 lengthImpl
+length :: ForeignStorage -> Effect Int
+length = runEffectFn1 lengthImpl
 
-key :: forall e. ForeignStorage -> Int -> Eff (storage :: STORAGE | e) (Maybe String)
-key = runEffFn4 keyImpl Nothing Just
+key :: ForeignStorage -> Int -> Effect (Maybe String)
+key = runEffectFn4 keyImpl Nothing Just
 
-getItem :: forall e. ForeignStorage -> String -> Eff (storage :: STORAGE | e) (Maybe String)
-getItem = runEffFn4 getItemImpl Nothing Just
+getItem :: ForeignStorage -> String -> Effect (Maybe String)
+getItem = runEffectFn4 getItemImpl Nothing Just
 
-setItem :: forall e. ForeignStorage -> String -> String -> Eff (storage :: STORAGE | e) Unit
-setItem = runEffFn3 setItemImpl
+setItem :: ForeignStorage -> String -> String -> Effect Unit
+setItem = runEffectFn3 setItemImpl
 
-removeItem :: forall e. ForeignStorage -> String -> Eff (storage :: STORAGE | e) Unit
-removeItem = runEffFn2 removeItemImpl
+removeItem :: ForeignStorage -> String -> Effect Unit
+removeItem = runEffectFn2 removeItemImpl
+ 
+clear :: ForeignStorage -> Effect Unit
+clear = runEffectFn1 clearImpl
 
-clear :: forall e. ForeignStorage -> Eff (storage :: STORAGE | e) Unit
-clear = runEffFn1 clearImpl
+-- getItemVar :: ForeignStorage -> String -> String -> Var String
+-- getItemVar storage key' = getItemVar' storage key' id id
 
-getItemVar :: forall e. ForeignStorage -> String -> String -> Var (storage :: STORAGE | e) String
-getItemVar storage key' = getItemVar' storage key' id id
+-- getItemVar' :: ForeignStorage -> String
+--   -> (a -> String) -> (String -> a) -> a -> Var a
+-- getItemVar' storage key' encode decode defaultItem = makeVar getItem' setItem'
+--   where
+--     getItem' = maybe defaultItem decode <$> getItem storage key'
+--     setItem' = setItem storage key' <<< encode
 
-getItemVar' :: forall e a. ForeignStorage -> String
-  -> (a -> String) -> (String -> a) -> a -> Var (storage :: STORAGE | e) a
-getItemVar' storage key' encode decode defaultItem = makeVar getItem' setItem'
-  where
-    getItem' = maybe defaultItem decode <$> getItem storage key'
-    setItem' = setItem storage key' <<< encode
-
-foreign import lengthImpl :: forall e. EffFn1 (storage :: STORAGE | e)
-  ForeignStorage Int
-foreign import keyImpl :: forall e. EffFn4 (storage :: STORAGE | e)
-  (Maybe String) (String -> Maybe String) ForeignStorage Int (Maybe String)
-foreign import getItemImpl :: forall e. EffFn4 (storage :: STORAGE | e)
-  (Maybe String) (String -> Maybe String) ForeignStorage String (Maybe String)
-foreign import setItemImpl :: forall e. EffFn3 (storage :: STORAGE | e)
-  ForeignStorage String String Unit
-foreign import removeItemImpl :: forall e. EffFn2 (storage :: STORAGE | e)
-  ForeignStorage String Unit
-foreign import clearImpl :: forall e. EffFn1 (storage :: STORAGE | e)
-  ForeignStorage Unit
+foreign import lengthImpl       :: EffectFn1 ForeignStorage Int
+foreign import keyImpl          :: EffectFn4 (Maybe String) (String -> Maybe String) ForeignStorage Int (Maybe String)
+foreign import getItemImpl      :: EffectFn4 (Maybe String) (String -> Maybe String) ForeignStorage String (Maybe String)
+foreign import setItemImpl      :: EffectFn3 ForeignStorage String String Unit
+foreign import removeItemImpl   :: EffectFn2 ForeignStorage String Unit
+foreign import clearImpl        :: EffectFn1 ForeignStorage Unit

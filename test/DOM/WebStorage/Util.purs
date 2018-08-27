@@ -2,26 +2,28 @@ module Spec.DOM.WebStorage.Util where
 
 import Prelude
 
-import Control.Monad.Aff (Aff)
-import Control.Monad.Eff.Class (liftEff)
-import Data.Argonaut.Core (foldJsonBoolean)
-import Data.Argonaut.Decode (class DecodeJson)
-import Data.Argonaut.Encode (class EncodeJson, encodeJson)
-import Data.Either (Either(..))
-import Data.Generic (class Generic, gEq, gShow)
-import Test.Spec (Spec, it)
-import Test.Spec.Assertions (shouldEqual)
+import Effect.Aff               (Aff)
+import Effect.Class             (liftEffect)
+import Data.Argonaut.Core       (caseJsonBoolean)
+import Data.Argonaut.Decode     (class DecodeJson)
+import Data.Argonaut.Encode     (class EncodeJson, encodeJson)
+import Data.Either              (Either(..))
+import Data.Generic.Rep         (class Generic)
+import Data.Generic.Rep.Eq      (genericEq)
+import Data.Generic.Rep.Show    (genericShow)
+import Test.Spec                (Spec, it)
+import Test.Spec.Assertions     (shouldEqual)
 
-import DOM.WebStorage (STORAGE, ForeignStorage, clear, length)
+import DOM.WebStorage           (ForeignStorage, clear, length)
 
 newtype ItemG = ItemG Boolean
-derive instance genericItemG :: Generic ItemG
+derive instance genericItemG :: Generic ItemG _
 
 instance showItemG :: Show ItemG where
-  show = gShow
+  show = genericShow
 
 instance eqItemG :: Eq ItemG where
-  eq = gEq
+  eq = genericEq
 
 newtype ItemJ = ItemJ Boolean
 
@@ -35,10 +37,10 @@ instance encodeItemJ :: EncodeJson ItemJ where
   encodeJson (ItemJ item) = encodeJson item
 
 instance decodeItemJ :: DecodeJson ItemJ where
-  decodeJson = map ItemJ <<< foldJsonBoolean (Left "Value is not a ItemJ") Right
+  decodeJson = map ItemJ <<< caseJsonBoolean (Left "Value is not a ItemJ") Right
 
 data ItemKey a = ItemGKey | ItemJKey
-derive instance genericItemKey :: Generic (ItemKey a)
+derive instance genericItemKey :: Generic (ItemKey a) _
 
 itemGKey :: ItemKey ItemG
 itemGKey = ItemGKey
@@ -46,12 +48,12 @@ itemGKey = ItemGKey
 itemJKey :: ItemKey ItemJ
 itemJKey = ItemJKey
 
-testLength :: forall e. ForeignStorage -> Ordering -> Int -> Aff (storage :: STORAGE | e) Unit
+testLength :: forall e. ForeignStorage -> Ordering -> Int -> Aff Unit
 testLength storage ordering expectedLength = do
-  length <- liftEff $ length storage
+  length <- liftEffect $ length storage
   (length `compare` expectedLength) `shouldEqual` ordering
 
-clearSpec :: forall e. ForeignStorage -> String -> Spec (storage :: STORAGE | e) Unit
+clearSpec :: forall e. ForeignStorage -> String -> Spec Unit
 clearSpec storage desc = it ("clear " <> desc) do
-  liftEff $ clear storage
+  liftEffect $ clear storage
   testLength storage EQ 0
